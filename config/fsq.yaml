@@ -1,0 +1,20 @@
+name: SepFSQ
+solo:
+    levels: 1
+    downs_t: [3,]
+    strides_t : [2,]
+    emb_width : 512
+    l_bins : 768
+    l_mu : 0.99
+    commit : 0.02
+    hvqvae_multipliers : [1,]
+    width: 512
+    depth: 2
+    m_conv : 1.0
+    dilation_growth_rate : 2
+    sample_length: 360
+    use_bottleneck: True
+    joint_channel: 6
+    vel: 1
+    acc: 1
+    vqvae_reverse_decoder_dilation: True
