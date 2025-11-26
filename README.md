@@ -3,7 +3,7 @@
 Code for **NeurIPS 2025** paper  
 **"MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation"**
 
-[[Paper]]([https://arxiv.org/abs/2505.17543]) 
+[[Paper]](https://arxiv.org/abs/2505.17543)
 
 ---
 
@@ -67,6 +67,7 @@ MEGADance/
     ├── test_fsq.py
     └── test_gpt.py     
 ```
+
 ---
 
 ## Training
@@ -78,17 +79,7 @@ Training code and instructions will be released soon.
 
 ## Evaluation
 
-### 1. Generate Dance Sequences
-
-To generate different genres dance based on a given music clip:
-
-```bash
-python demo_gpt.py --root_dir ./demo/1
-```
-
-This will generate the dance motion corresponding to the given music.
-
-### 2. Evaluate the Model
+### Evaluate the Model
 
 To evaluate the Stage1 model’s performance:
 
@@ -101,6 +92,16 @@ To evaluate the Stage2 model’s performance:
 ```bash
 python test_gpt.py
 ```
+
+## Inference
+
+To generate different genres dance based on a given music clip:
+
+```bash
+python demo_gpt.py --root_dir ./demo/1
+```
+
+This will generate the dance motion corresponding to the given music.
 
 
 ---
