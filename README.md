@@ -4,16 +4,13 @@ Official code for the **NeurIPS 2025** paper
 **"MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation"**
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2505.17543">Paper</a> |
+  <a href="https://arxiv.org/abs/2505.17543">Paper</a>
 </p>
 
 ✨Training code release.✨
 
 ## Video Demo
-
-<p align="center">
-  <a href="./teaser/genrecontrol.mp4"><strong>Watch the teaser video</strong></a>
-</p>
+https://github.com/user-attachments/assets/0896dc29-0efa-41de-96ab-5c9823e013d9
 
 > Music-driven 3D dance generation has attracted increasing attention in recent years, with promising applications in choreography, virtual reality, and creative content creation. Previous research has generated promising realistic dance movement from audio signals. However, traditional methods underutilize genre conditioning, often treating it as auxiliary modifiers rather than core semantic drivers. This oversight compromises music-motion synchronization and disrupts dance genre continuity, particularly during complex rhythmic transitions, thereby leading to visually unsatisfactory effects. To address the challenge, we propose MEGADance, a novel architecture for music-driven 3D dance generation. By decoupling choreographic consistency into dance generality and genre specificity, MEGADance demonstrates significant dance quality and strong genre controllability. It consists of two stages: (1) High-Fidelity Dance Quantization Stage (HFDQ), which encodes dance motions into a latent representation by Finite Scalar Quantization (FSQ) and reconstructs them with kinematic-dynamic constraints, and (2) Genre-Aware Dance Generation Stage (GADG), which maps music into the latent representation by synergistic utilization of Mixture-of-Experts (MoE) mechanism with Mamba-Transformer hybrid backbone. Extensive experiments on the FineDance and AIST++ dataset demonstrate the state-of-the-art performance of MEGADance both qualitatively and quantitatively.
 ---
