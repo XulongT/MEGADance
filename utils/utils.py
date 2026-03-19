@@ -12,7 +12,7 @@ import kornia as tgm
 def keypoint_from_smpl1(smpl_trans, smpl_pred, smpl_root_vel, smpl):
     b, t, _ = smpl_trans.shape
     keypoints_r = torch.zeros((b, t, 45, 3)).cuda()
-    J, stride = 23, 1
+    J, stride = 23, 8
     for i in range(0, b, stride):
         upper_bound = min(i+stride, b)
         smpl_trans_slice = smpl_trans[i:upper_bound].reshape(-1, 3).cuda()
@@ -29,7 +29,7 @@ def keypoint_from_smpl1(smpl_trans, smpl_pred, smpl_root_vel, smpl):
     b, t, _ = smpl_trans.shape
     smpl_trans = smpl_root_vel
     keypoints_r1 = torch.zeros((b, t, 45, 3)).cuda()
-    J, stride = 23, 1
+    J, stride = 23, 8
     for i in range(0, b, stride):
         upper_bound = min(i+stride, b)
         smpl_trans_slice = smpl_trans[i:upper_bound].reshape(-1, 3).cuda()
@@ -49,7 +49,7 @@ def keypoint_from_smpl1(smpl_trans, smpl_pred, smpl_root_vel, smpl):
 def keypoint_from_smpl(smpl_trans, smpl_pred, smpl):
     b, t, _ = smpl_trans.shape
     keypoints_r = torch.zeros((b, t, 45, 3))
-    J, stride = 23, 8
+    J, stride = 23, 16
     for i in range(0, b, stride):
         upper_bound = min(i+stride, b)
         smpl_trans_slice = smpl_trans[i:upper_bound].reshape(-1, 3).cuda()
@@ -68,7 +68,7 @@ def root_preprocess(x):
     b, t, _ = x.shape
     root_init = x[:, 0, :3].clone()
     root_vel = torch.zeros((b, t, 3)).to(x.device)
-    root_vel[:, :-1, :3] = x[:, 1:, :3] - x[:, :-1, :3] # root position
+    root_vel[:, :-1, :3] = x[:, 1:, :3] - x[:, :-1, :3] 
     return root_init, root_vel
 
 def root_postprocess(root_init, x):
@@ -88,12 +88,30 @@ def denormalize(data, mean=0, std=1):
     return data * std + mean 
 
 def matrix_to_rotation_6d(matrix: torch.Tensor) -> torch.Tensor:
+    """
+    Converts rotation matrices to 6D rotation representation by Zhou et al. [1]
+    by dropping the last row. Note that 6D representation is not unique.
+    Args:
+        matrix: batch of rotation matrices of size (*, 3, 3)
 
+    Returns:
+        6D rotation representation, of size (*, 6)
+
+    """
     return matrix[..., :2, :].clone().reshape(*matrix.size()[:-2], 6)
 
 
 def rotation_6d_to_matrix(d6: torch.Tensor) -> torch.Tensor:
+    """
+    Converts 6D rotation representation by Zhou et al. [1] to rotation matrix
+    using Gram--Schmidt orthogonalization per Section B of [1].
+    Args:
+        d6: 6D rotation representation, of size (*, 6)
 
+    Returns:
+        batch of rotation matrices of size (*, 3, 3)
+
+    """
 
     a1, a2 = d6[..., :3], d6[..., 3:]
     b1 = F.normalize(a1, dim=-1)
@@ -113,7 +131,7 @@ def rotation_matrix_to_angle_axis(rotation_matrices):
     angles = torch.acos(cos_theta)
     small_angles = angles < 1e-6
 
- 
+
     omegas = torch.empty(rotation_matrices.shape[:-2] + (3,), device=rotation_matrices.device, dtype=rotation_matrices.dtype)
     omegas[..., 0] = rotation_matrices[..., 2, 1] - rotation_matrices[..., 1, 2]
     omegas[..., 1] = rotation_matrices[..., 0, 2] - rotation_matrices[..., 2, 0]
@@ -145,9 +163,9 @@ def batch_rotation_matrix_to_angle_axis(rotation_matrices):
     omegas[..., 2] = rotation_matrices[..., 1, 0] - rotation_matrices[..., 0, 1]
     
     sin_angles = torch.sin(angles)
-    with torch.no_grad(): 
+    with torch.no_grad():  
         omegas /= (2 * sin_angles.unsqueeze(-1))
-        omegas[small_angles] = 0.0 
+        omegas[small_angles] = 0.0  
     
     angle_axis = angles.unsqueeze(-1) * omegas
     angle_axis[small_angles] = 0.0  
@@ -167,7 +185,7 @@ def batch_rotation_matrix_to_angle_axis(rotation_matrices):
     sin_angles = np.sin(angles)
     with np.errstate(divide='ignore', invalid='ignore'):
         omegas /= (2 * sin_angles[..., np.newaxis])
-        omegas[small_angles] = 0  
+        omegas[small_angles] = 0 
     
     angle_axis = angles[..., np.newaxis] * omegas
     angle_axis[small_angles] = 0  
@@ -230,9 +248,9 @@ def rotation_6d_to_angle_axis(smpl_poses):
 def similarity_matrix(music_features, dance_features):
 
 
+
     music_norm = music_features / music_features.norm(dim=2, keepdim=True)
     dance_norm = dance_features / dance_features.norm(dim=2, keepdim=True)
-    
 
     music_norm = music_norm.permute(1, 0, 2)  
     dance_norm = dance_norm.permute(1, 0, 2)  

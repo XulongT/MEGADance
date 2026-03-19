@@ -84,4 +84,4 @@ def extract_acoustic_feature(audio, sr):
 
 
 if __name__ == '__main__':
-    extract_librosa('./data/music/input_music_seg', './data/music/librosa') 
+    extract_librosa('/data/music/input_music_seg', '/data3/yangkaixing/CustomDance/GPT/Genre-Control-Deep/comparison/data/music/librosa') 

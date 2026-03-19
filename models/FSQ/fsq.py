@@ -89,7 +89,6 @@ class Conv1DQuantizer(nn.Module):
         xs_quantised = rearrange(xs_quantised, 'b t c -> b c t')
         return [xs_quantised]
 
-
 class Conv1DDecoder(nn.Module):
     def __init__(self, hps, output_dim=72):
         super().__init__()

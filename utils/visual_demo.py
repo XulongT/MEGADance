@@ -103,8 +103,8 @@ def calculate_coordinate_range(joints):
     return min_x, max_x, min_y, max_y
 
 def save_img(k, all_joints3d, image_path):
-    elev = 20  # 仰角，0度是从X-Y平面看，90度是从上往下看
-    azim = 60  # 方位角，0度是从Y轴的负方向看，90度是从X轴看
+    elev = 20  
+    azim = 60 
     min_lin, max_lin = np.min(all_joints3d[:, :, :, :].reshape(-1, 3), axis=0), np.max(all_joints3d[:, :, :, :].reshape(-1, 3), axis=0)
     ax = plt.axes(projection='3d')
     ax.set_xlabel('X axis')

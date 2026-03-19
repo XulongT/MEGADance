@@ -5,7 +5,7 @@ import yaml
 from types import SimpleNamespace
 import torch
 from einops import rearrange
-from utils.utils import normalize, denormalize, root_postprocess, keypoint_from_smpl, keypoint_from_smpl1, rotation_6d_to_angle_axis
+from utils.utils import normalize, denormalize, root_postprocess, keypoint_from_smpl1, rotation_6d_to_angle_axis
 from smplx import SMPL
 import torch as t
 
@@ -57,6 +57,7 @@ class SepFSQ(nn.Module):
 
         self.L1_Loss = nn.L1Loss()
         self.Pose_Loss = Motion_Loss(self.hps)
+        self.levels = [7, 5, 5, 5, 5]
 
         mean, std = torch.load('./Pretrained/mean.pt'), torch.load('./Pretrained/std.pt')
         self.smpl_trans_mean, self.smpl_poses_mean, self.smpl_root_vel_mean  = \
@@ -153,15 +154,13 @@ class SepFSQ(nn.Module):
     def add_by_index_bincount(self, a, b):
 
         indices = b.view(-1).long()  
-
-        counts = torch.bincount(indices, minlength=a.size(0))
         
+        counts = torch.bincount(indices, minlength=a.size(0))
 
         a.add_(counts)
         return a
 
     def pose_encode(self, smpl_poses_gt, smpl_root_vel_gt):
-
         pose = smpl_poses_gt
         b, t, c = pose.size()
         pose = pose.view(b, t, 24, 6)
@@ -177,13 +176,18 @@ class SepFSQ(nn.Module):
         pose_down_index, pose_down_quantised = self.Pose_DOWN_Quantizer(pose_down_encoded)
 
         pose_up_index = pose_up_index[0]
+        pose_up_index = self.index_to_multi_level_tensor(pose_up_index, self.levels)
         pose_down_index = pose_down_index[0]
+        pose_down_index = self.index_to_multi_level_tensor(pose_down_index, self.levels)
 
         return pose_up_index, pose_down_index
 
     def pose_decode(self, pose_up_idx, pose_down_idx):
         b, t, _ = pose_up_idx.shape
         t = 8 * t
+
+        pose_up_idx = self.multi_level_to_index_tensor(pose_up_idx, self.levels)
+        pose_down_idx = self.multi_level_to_index_tensor(pose_down_idx, self.levels)
 
         pose_up_quantised = self.Pose_UP_Quantizer.get_feature_from_index(pose_up_idx)
         pose_down_quantised = self.Pose_DOWN_Quantizer.get_feature_from_index(pose_down_idx)
@@ -199,15 +203,58 @@ class SepFSQ(nn.Module):
         pose_decoded = rearrange(pose_decoded, 'b t c1 c2 -> b t (c1 c2)')
 
         return root_vel_decoded, pose_decoded
+
+    def index_to_multi_level_tensor(self, indices: torch.Tensor, levels: list[int]) -> torch.Tensor:
+        """
+        Convert indices of shape (b, t, 1) to multi-level indices of shape (b, t, num_levels)
         
+        Args:
+            indices: Tensor of shape (b, t, 1)
+            levels: list of int, quantization levels, e.g., [8, 5, 5, 3]
+
+        Returns:
+            Tensor of shape (b, t, num_levels)
+        """
+        device = indices.device
+        levels_tensor = torch.tensor(levels, dtype=torch.long, device=device)
+        basis = torch.cumprod(
+            torch.cat([torch.ones(1, dtype=torch.long, device=device), levels_tensor[:-1]]), dim=0
+        )  # (num_levels,)
+
+        # (b, t, 1) // (1, 1, num_levels) => (b, t, num_levels)
+        indices_expanded = indices.expand(-1, -1, len(levels))
+        level_indices = (indices_expanded // basis) % levels_tensor
+        return level_indices
+
+    def multi_level_to_index_tensor(self, level_indices: torch.Tensor, levels: list[int]) -> torch.Tensor:
+        """
+        Convert multi-level indices (b, t, num_levels) to flat index (b, t, 1)
+
+        Args:
+            level_indices: Tensor of shape (b, t, num_levels)
+            levels: list of int, quantization levels
+
+        Returns:
+            Tensor of shape (b, t, 1)
+        """
+        device = level_indices.device
+        levels_tensor = torch.tensor(levels, dtype=torch.long, device=device)
+        basis = torch.cumprod(
+            torch.cat([torch.ones(1, dtype=torch.long, device=device), levels_tensor[:-1]]), dim=0
+        )  # (num_levels,)
+        
+        index = (level_indices * basis).sum(dim=-1, keepdim=True)
+        return index
+
     def preprocess(self, data, device):
         music_librosa = data['music_librosa'].to(device).float()
         music_librosa = normalize(music_librosa, self.music_librosa_mean, self.music_librosa_std)
 
-        if 'label' in data.keys():
+        if 'label' in data and data['label'] is not None:
             label = data['label'].to(device).long()
         else:
             label = None
+
         
         keypoint = data['keypoint'].to(device).float()
         smpl_trans_gt = data['smpl_trans'].to(device).float()
@@ -227,6 +274,4 @@ class SepFSQ(nn.Module):
         smpl_poses = denormalize(smpl_poses, self.smpl_poses_mean, self.smpl_poses_std)
         smpl_poses_axis = rotation_6d_to_angle_axis(smpl_poses)
         keypoints, keypoints_static = keypoint_from_smpl1(smpl_trans, smpl_poses_axis, smpl_root_vel, self.smpl)
-        # keypoints = keypoint_from_smpl(smpl_trans, smpl_poses_axis, self.smpl)
-        # keypoints_static = None
         return smpl_trans, smpl_root_vel, smpl_poses, keypoints, keypoints_static, smpl_poses_axis

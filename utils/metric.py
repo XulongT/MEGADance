@@ -100,6 +100,7 @@ def compute_acc(pred_logits, gt_labels):
 
     pred_np = pred_classes.cpu().numpy()
     gt_np = gt_labels.cpu().numpy()
+    
 
     correct = (pred_classes == gt_labels).sum().item()
     accuracy = correct / gt_labels.size(0)
@@ -193,18 +194,16 @@ def calculate_avg_distance(feat):
 from sklearn.metrics import precision_score, recall_score
 def compute_metrics(pred_logits, gt_labels):
 
-    # pred class
     pred_classes = torch.argmax(pred_logits, dim=1)
     
 
     pred_np = pred_classes.cpu().numpy()
     gt_np = gt_labels.cpu().numpy()
     
-    # acc
+
     correct = (pred_classes == gt_labels).sum().item()
     accuracy = correct / gt_labels.size(0)
-    
-    # precision and recall
+
     precision = precision_score(gt_np, pred_np, average='macro', zero_division=0)
     recall = recall_score(gt_np, pred_np, average='macro', zero_division=0)
     

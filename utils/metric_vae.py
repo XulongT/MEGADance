@@ -5,8 +5,8 @@ from smplx import SMPL
 import torch
 import numpy as np
 import pickle as pkl
-# from utils.features.kinetic import extract_kinetic_features
-# from utils.features.manual import extract_manual_features
+from utils.features.kinetic import extract_kinetic_features
+from utils.features.geometric import extract_geometric_features
 from utils.utils import similarity_matrix, compute_rank
 from scipy import linalg
 from scipy.ndimage import gaussian_filter as G

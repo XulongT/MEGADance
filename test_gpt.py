@@ -3,7 +3,7 @@ import torch.optim as optim
 from utils.metric import Metric
 from utils.savefig import savefig
 from utils.utils import seed_everything
-from models.GPT.dataloader import createEvalDataset
+from models.GPT.dataloader import createTrainDataset, createEvalDataset
 from models.GPT.trainer import Trainer
 from datetime import datetime
 from tqdm import tqdm
@@ -30,8 +30,8 @@ def main():
     batch_size = 128
 
     root_dir = './data/FineDance'
-    exp_name = 'GPT'
-    epoch = 50
+    exp_name = 'gpt'
+    epoch = 90
 
     print('Loading Data')
     print('Construct Eval Data')

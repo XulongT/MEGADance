@@ -13,6 +13,45 @@ from utils.utils import keypoint_from_smpl
 import torch.nn.functional as F
 from einops import rearrange
 
+def read_txt_to_list(file_path):
+    return [int(line.strip()) for line in open(file_path).readlines() if line.strip()]
+
+def contains_anomaly(anomalies, start, end):
+    return any(start <= p < end for p in anomalies)
+
+def createTrainDataset(root_dir='./data', batch_size=32, stride=16, sample_len=240, start=0, end=1):
+    with open(os.path.join(root_dir, 'train.txt'), 'r') as file:
+        file_names = [line.strip() for line in file]
+    smpl_poses, smpl_trans, musics = [], [], []
+
+    for file_name in tqdm(file_names):
+
+        motion_file_path = os.path.join(root_dir, 'motion', file_name+'.pkl')
+        motion_file = open(motion_file_path, 'rb')
+        motion_data = pickle.load(motion_file)
+        smpl_pose, smpl_tran = motion_data['smpl_poses'], motion_data['smpl_trans']
+
+        librosa_file_path = os.path.join(root_dir, 'librosa', file_name+'.pkl')
+        librosa_file = open(librosa_file_path, 'rb')
+        librosa_music = pickle.load(librosa_file)['music']
+
+        anomaly_file_path = os.path.join(root_dir, 'anomaly', file_name+'.txt')
+        anomaly_list = read_txt_to_list(anomaly_file_path)
+
+        total_length = min(smpl_pose.shape[0], smpl_tran.shape[0], librosa_music.shape[0]//8*8)
+        for i in range(start, total_length+end-sample_len, stride):
+            # if contains_anomaly(anomaly_list, i, i+sample_len):
+            #     continue
+            smpl_poses.append(smpl_pose[i:i+sample_len, :])
+            smpl_trans.append(smpl_tran[i:i+sample_len, :])
+            musics.append(librosa_music[i:i+sample_len, :])
+
+    smpl_poses, smpl_trans, musics = np.array(smpl_poses), np.array(smpl_trans), np.array(musics)
+    print(smpl_poses.shape, smpl_trans.shape, musics.shape)
+    print('Train Dataset len: ', smpl_poses.shape[0])
+    train_dataloader = DataLoader(TrainDataset(smpl_poses, smpl_trans, musics, file_names), batch_size=batch_size, shuffle=True)
+    return train_dataloader
+
 
 def createEvalDataset(root_dir='./data', batch_size=32, stride=10000, sample_len=1024, start=0, end=1):
     with open(os.path.join(root_dir, 'test.txt'), 'r') as file:
@@ -44,6 +83,57 @@ def createEvalDataset(root_dir='./data', batch_size=32, stride=10000, sample_len
     return eval_dataloader
 
 
+class TrainDataset(Dataset):
+    def __init__(self, smpl_poses, smpl_trans, music_librosa, file_names):
+
+        music_librosa = torch.from_numpy(music_librosa)
+        smpl_trans = torch.from_numpy(smpl_trans)
+        smpl_root_init, smpl_root_vel = root_preprocess(smpl_trans)
+        smpl_poses = torch.from_numpy(smpl_poses)
+        keypoints = get_keypoint(smpl_poses.clone(), smpl_root_vel.clone())
+        smpl_poses = rotation_matrix_to_rotation_6d(smpl_poses)
+        
+        music_librosa_mean, music_librosa_std = torch.mean(music_librosa, dim=(0, 1)), torch.std(music_librosa, dim=(0, 1))
+
+        smpl_trans_mean, smpl_trans_std = torch.mean(smpl_trans, dim=(0, 1, 2)), torch.std(smpl_trans, dim=(0, 1, 2))
+        smpl_poses_mean, smpl_poses_std = torch.mean(smpl_poses, dim=(0, 1, 2)), torch.std(smpl_poses, dim=(0, 1, 2))
+        smpl_root_vel_mean, smpl_root_vel_std = torch.mean(smpl_root_vel, dim=(0, 1, 2)), torch.std(smpl_root_vel, dim=(0, 1, 2))
+
+
+        torch.save({
+            'music_librosa_mean': music_librosa_mean,
+            'smpl_trans_mean': smpl_trans_mean,
+            'smpl_poses_mean': smpl_poses_mean,
+            'smpl_root_vel_mean': smpl_root_vel_mean,
+        }, './Pretrained/mean.pt')
+        torch.save({
+            'music_librosa_std': music_librosa_std,
+            'smpl_trans_std': smpl_trans_std,
+            'smpl_poses_std': smpl_poses_std,
+            'smpl_root_vel_std': smpl_root_vel_std,
+        }, './Pretrained/std.pt')
+        print('Save MEAN and STD!')
+
+        self.keypoints = keypoints
+        self.music_librosa = music_librosa
+        self.smpl_trans = smpl_trans
+        self.smpl_poses = smpl_poses
+        self.smpl_root_vel = smpl_root_vel
+        self.smpl_root_init = smpl_root_init
+        self.filenames = file_names
+
+
+    def __len__(self):
+        return len(self.smpl_poses)
+    
+    def __getitem__(self, idx):
+        smpl_trans = self.smpl_trans[idx]
+        smpl_poses = self.smpl_poses[idx]
+        smpl_root_vel = self.smpl_root_vel[idx]
+        music_librosa = self.music_librosa[idx]
+
+        return {'smpl_trans': smpl_trans, 'smpl_poses': smpl_poses, 'smpl_root_init': self.smpl_root_init[idx], 'smpl_root_vel': smpl_root_vel, 
+                    'keypoint': self.keypoints[idx], 'music_librosa': music_librosa}
 
 class EvalDataset(Dataset):
     def __init__(self, smpl_poses, smpl_trans, music_librosa, file_names):

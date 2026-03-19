@@ -11,7 +11,20 @@ from datetime import datetime
 from tqdm import tqdm
 from utils.adan import Adan
 from lion_pytorch import Lion
-from utils.load_model import load_model
+
+def train(model, device, train_loader, optimizer, epoch):
+    model.train()
+    losses = []
+    for batch_idx, data in tqdm(enumerate(train_loader)):
+        optimizer.zero_grad()
+        _, loss = model(data, device)
+        loss['total'].backward()
+        losses.append(loss['total'])
+        optimizer.step()
+
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f'Train Epoch: {epoch} | Timestep: {current_time} | Loss: {float(sum(losses)/len(losses))}')
+
 
 def validate(model, device, eval_loader, epoch, root_dir, exp_name):
     model.eval()
@@ -37,17 +50,26 @@ def main():
 
     root_dir = './data/FineDance'
     exp_name = 'cls'
-    epoch = 30
 
     print('Loading Data')
+    print('Construct Training Data')
+    train_loader = createTrainDataset(root_dir=root_dir, batch_size=batch_size)
     print('Construct Eval Data')
     eval_loader = createEvalDataset(root_dir=root_dir, batch_size=batch_size)
 
     model_args = {'device': device}
     model = CLS(**model_args).to(device)
-    model = load_model(model, exp_name, epoch)
 
-    validate(model, device, eval_loader, epoch, root_dir, exp_name)
+    optimizer = optim.Adam(model.parameters(), lr=1e-5, betas=[0.5, 0.999])
+    scheduler = StepLR(optimizer, step_size=5, gamma=0.33)
+    # optimizer = Adan(model.parameters(), lr=4e-4, weight_decay=0.02)
+    # optimizer = Lion(model.parameters(), lr=3e-5, betas=(0.9, 0.999))
+
+    print('Start Training!')
+    for epoch in range(1, 31):
+        train(model, device, train_loader, optimizer, epoch)
+        validate(model, device, eval_loader, epoch, root_dir, exp_name)
+        scheduler.step()
 
 if __name__ == '__main__':
     main()

@@ -32,9 +32,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Demo script with hyperparameters')
     parser.add_argument('--root_dir', type=str, default='./demo/4',
                         help='Root directory for the demo data')
-    parser.add_argument('--exp_name', type=str, default='GPT',
+    parser.add_argument('--exp_name', type=str, default='gpt',
                         help='Experiment name')
-    parser.add_argument('--epoch', type=int, default=50,
+    parser.add_argument('--epoch', type=int, default=90,
                         help='Epoch number for model loading')
 
     args = parser.parse_args()

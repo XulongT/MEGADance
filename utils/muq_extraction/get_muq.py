@@ -11,7 +11,6 @@ def upsample_features(features, original_fps=25, target_fps=30):
 
     b, t, c = features.shape
     
-
     target_t = int(t * target_fps / original_fps)  
     
 
@@ -49,18 +48,15 @@ def extract_muq(a_folder, b_folder):
             
 
             last_hidden = output.last_hidden_state
-                
 
             upsampled = upsample_features(last_hidden)[0].cpu().numpy()
 
             print(wav_path, upsampled.shape)
-            
 
             pkl_path = os.path.join(
                 b_folder,
                 os.path.basename(wav_path).replace(".wav", ".pkl")
             )
-            
 
             with open(pkl_path, "wb") as f:
                 pickle.dump(
@@ -69,12 +65,12 @@ def extract_muq(a_folder, b_folder):
                 )
                 
         except Exception as e:
-            print(f"error: {wav_path} - {str(e)}")
+            print(f"处理失败: {wav_path} - {str(e)}")
             continue
 
 if __name__ == "__main__":
 
-    
+
     input_folder = "./data/FineDance/music"
     output_folder = "./data/FineDance/muq"
     

@@ -5,7 +5,7 @@ import time
 from scipy import linalg
 
 def calc_fid_torch(kps_gen, kps_gt, device):
-    start_time = time.time()  
+    start_time = time.time()  # 记录开始时间
     
     # Convert data to PyTorch tensors and move to GPU/CPU as per device setting
     kps_gen = torch.tensor(kps_gen, dtype=torch.float32, device=device)
@@ -48,13 +48,13 @@ def calc_fid_torch(kps_gen, kps_gt, device):
     # Final FID calculation
     fid_score = (diff.dot(diff) + torch.trace(sigma_gen) + torch.trace(sigma_gt) - 2 * tr_covmean).item()
 
-    elapsed_time = time.time() - start_time 
+    elapsed_time = time.time() - start_time  # 计算耗时
     return fid_score, elapsed_time
 
 
 def calc_fid(kps_gen, kps_gt):
 
-    start_time = time.time()  
+    start_time = time.time()  # 记录开始时间
 
     kps_gen, kps_gt = np.array(kps_gen), np.array(kps_gt)
     # mean, std = kps_gt.
@@ -86,7 +86,7 @@ def calc_fid(kps_gen, kps_gt):
             covmean = covmean.real
 
     tr_covmean = np.trace(covmean)
-    elapsed_time = time.time() - start_time  
+    elapsed_time = time.time() - start_time  # 计算耗时
 
     return (diff.dot(diff) + np.trace(sigma1)
             + np.trace(sigma2) - 2 * tr_covmean), elapsed_time

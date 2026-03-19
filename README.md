@@ -1,15 +1,26 @@
 # MEGADance
 
-Code for **NeurIPS 2025** paper  
+Official code for the **NeurIPS 2025** paper  
 **"MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation"**
 
-[[Paper]](https://arxiv.org/abs/2505.17543)
+<p align="center">
+  <a href="https://arxiv.org/abs/2505.17543">Paper</a> |
+</p>
 
+✨Training code release.✨
+
+## Video Demo
+
+<p align="center">
+  <a href="./teaser/genrecontrol.mp4"><strong>Watch the teaser video</strong></a>
+</p>
+
+> Music-driven 3D dance generation has attracted increasing attention in recent years, with promising applications in choreography, virtual reality, and creative content creation. Previous research has generated promising realistic dance movement from audio signals. However, traditional methods underutilize genre conditioning, often treating it as auxiliary modifiers rather than core semantic drivers. This oversight compromises music-motion synchronization and disrupts dance genre continuity, particularly during complex rhythmic transitions, thereby leading to visually unsatisfactory effects. To address the challenge, we propose MEGADance, a novel architecture for music-driven 3D dance generation. By decoupling choreographic consistency into dance generality and genre specificity, MEGADance demonstrates significant dance quality and strong genre controllability. It consists of two stages: (1) High-Fidelity Dance Quantization Stage (HFDQ), which encodes dance motions into a latent representation by Finite Scalar Quantization (FSQ) and reconstructs them with kinematic-dynamic constraints, and (2) Genre-Aware Dance Generation Stage (GADG), which maps music into the latent representation by synergistic utilization of Mixture-of-Experts (MoE) mechanism with Mamba-Transformer hybrid backbone. Extensive experiments on the FineDance and AIST++ dataset demonstrate the state-of-the-art performance of MEGADance both qualitatively and quantitatively.
 ---
 
-# Code
+## Setup and Usage
 
-## Set up the Environment
+### Set up the Environment
 
 To set up the necessary environment for running this project, follow the steps below:
 
@@ -24,7 +35,7 @@ To set up the necessary environment for running this project, follow the steps b
 
    MEGADance requires **PyTorch 2.7.1 with CUDA 12.8**, which is available only through the official PyTorch wheel index:
 
-   ```
+   ```bash
    pip install torch==2.7.1+cu128 torchvision==0.22.1+cu128 torchaudio==2.7.1+cu128 \
        --index-url https://download.pytorch.org/whl/cu128
    ```
@@ -51,29 +62,44 @@ To set up the necessary environment for running this project, follow the steps b
 
 After downloading the necessary data and models, ensure the directory structure follows the pattern below:
 
-```
+```text
 MEGADance/
-    │
-    ├── config/                   
-    ├── data/                 
-    ├── demo/             
-    ├── models/                               
-    ├── output/  
-    ├── Pretrained/
-    ├── utils/
-    ├── requirements.txt
-    ├── demo_gpt.py  
-    ├── test_cls.py
-    ├── test_fsq.py
-    └── test_gpt.py     
+|-- config/
+|-- data/
+|-- demo/
+|-- models/
+|-- output/
+|-- Pretrained/
+|-- utils/
+|-- requirements.txt
+|-- demo_gpt.py
+|-- test_cls.py
+|-- test_fsq.py
+`-- test_gpt.py
 ```
 
 ---
 
 ## Training
 
-Training code and instructions will be released soon.  
-**Coming soon...**
+### Train the Model
+To train the dance genre classifier:
+
+```bash
+python train_cls.py
+```
+
+To train the Stage1 model:
+
+```bash
+python train_fsq.py
+```
+
+To train the Stage2 model:
+
+```bash
+python train_gpt.py
+```
 
 ---
 
@@ -81,13 +107,13 @@ Training code and instructions will be released soon.
 
 ### Evaluate the Model
 
-To evaluate the Stage1 model’s performance:
+To evaluate the Stage1 model's performance:
 
 ```bash
 python test_fsq.py
 ```
 
-To evaluate the Stage2 model’s performance:
+To evaluate the Stage2 model's performance:
 
 ```bash
 python test_gpt.py
@@ -106,7 +132,7 @@ This will generate the dance motion corresponding to the given music.
 
 ---
 
-# Citation
+## Citation
 
 ```bibtex
 @article{yang2025megadance,
