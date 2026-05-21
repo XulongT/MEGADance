@@ -1,11 +1,8 @@
-# MEGADance
+# MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation
 
-Official code for the **NeurIPS 2025** paper  
-**"MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation"**
-
-<p align="center">
-  <a href="https://arxiv.org/abs/2505.17543">Paper</a>
-</p>
+[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2505.17543)
+[![Project Page](https://img.shields.io/badge/Project-Page-2ea44f?logo=githubpages&logoColor=white)](https://sun-happy-ykx.github.io/MEGADance/)
+[![Training Code](https://img.shields.io/badge/Training-Code-4169e1?logo=github&logoColor=white)](#training)
 
 ✨Training code release.✨
 
