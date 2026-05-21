@@ -1,8 +1,17 @@
-# MEGADance: Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation
+<h1 align="center">💥 MEGADance</h1>
+<h3 align="center">Mixture-of-Experts Architecture for Genre-Aware 3D Dance Generation</h3>
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2505.17543)
-[![Project Page](https://img.shields.io/badge/Project-Page-2ea44f?logo=githubpages&logoColor=white)](https://sun-happy-ykx.github.io/MEGADance/)
-[![Training Code](https://img.shields.io/badge/Training-Code-4169e1?logo=github&logoColor=white)](#training)
+<p align="center">
+  <a href="https://arxiv.org/abs/2505.17543">
+    <img src="https://img.shields.io/badge/Paper-arXiv-b31b1b?logo=arxiv&logoColor=white" alt="Paper">
+  </a>
+  <a href="https://sun-happy-ykx.github.io/MEGADance/">
+    <img src="https://img.shields.io/badge/Project-Page-2ea44f?logo=githubpages&logoColor=white" alt="Project Page">
+  </a>
+  <a href="#training">
+    <img src="https://img.shields.io/badge/Training-Code-4169e1?logo=github&logoColor=white" alt="Training Code">
+  </a>
+</p>
 
 ✨Training code release.✨
 
@@ -11,9 +20,9 @@ https://github.com/user-attachments/assets/0896dc29-0efa-41de-96ab-5c9823e013d9
 > Music-driven 3D dance generation has attracted increasing attention in recent years, with promising applications in choreography, virtual reality, and creative content creation. Previous research has generated promising realistic dance movement from audio signals. However, traditional methods underutilize genre conditioning, often treating it as auxiliary modifiers rather than core semantic drivers. This oversight compromises music-motion synchronization and disrupts dance genre continuity, particularly during complex rhythmic transitions, thereby leading to visually unsatisfactory effects. To address the challenge, we propose MEGADance, a novel architecture for music-driven 3D dance generation. By decoupling choreographic consistency into dance generality and genre specificity, MEGADance demonstrates significant dance quality and strong genre controllability. It consists of two stages: (1) High-Fidelity Dance Quantization Stage (HFDQ), which encodes dance motions into a latent representation by Finite Scalar Quantization (FSQ) and reconstructs them with kinematic-dynamic constraints, and (2) Genre-Aware Dance Generation Stage (GADG), which maps music into the latent representation by synergistic utilization of Mixture-of-Experts (MoE) mechanism with Mamba-Transformer hybrid backbone. Extensive experiments on the FineDance and AIST++ dataset demonstrate the state-of-the-art performance of MEGADance both qualitatively and quantitatively.
 ---
 
-## Setup and Usage
+## 🚀 Setup and Usage
 
-### Set up the Environment
+### 🛠️ Set up the Environment
 
 To set up the necessary environment for running this project, follow the steps below:
 
@@ -41,7 +50,7 @@ To set up the necessary environment for running this project, follow the steps b
 
 ---
 
-## Download Resources
+## 📦 Download Resources
 
 - Download the **Preprocessed feature** from [Google Drive](https://drive.google.com/file/d/1Ttz28v_cgW3Fevu_kMquLBfN6BWdDwuI/view?usp=sharing) and place them into `./data/` folder.
 - Download our **Pretrained model weights** and place them into the `./Pretrained/` folder:  
@@ -51,7 +60,7 @@ To set up the necessary environment for running this project, follow the steps b
 
 ---
 
-## Directory Structure
+## 🧩 Directory Structure
 
 After downloading the necessary data and models, ensure the directory structure follows the pattern below:
 
@@ -73,9 +82,11 @@ MEGADance/
 
 ---
 
-## Training
+<a id="training"></a>
 
-### Train the Model
+## 🏋️ Training
+
+### 🧪 Train the Model
 To train the dance genre classifier:
 
 ```bash
@@ -96,9 +107,9 @@ python train_gpt.py
 
 ---
 
-## Evaluation
+## 📏 Evaluation
 
-### Evaluate the Model
+### 🧪 Evaluate the Model
 
 To evaluate the Stage1 model's performance:
 
@@ -112,7 +123,7 @@ To evaluate the Stage2 model's performance:
 python test_gpt.py
 ```
 
-## Inference
+## 🎬 Inference
 
 To generate different genres dance based on a given music clip:
 
@@ -125,7 +136,7 @@ This will generate the dance motion corresponding to the given music.
 
 ---
 
-## Citation
+## 📄 Citation
 
 ```bibtex
 @article{yang2025megadance,
