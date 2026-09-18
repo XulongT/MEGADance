@@ -52,11 +52,11 @@ To set up the necessary environment for running this project, follow the steps b
 
 ## 📦 Download Resources
 
-- Download the **Preprocessed feature** from [Google Drive](https://drive.google.com/file/d/1Ttz28v_cgW3Fevu_kMquLBfN6BWdDwuI/view?usp=sharing) and place them into `./data/` folder.
+- Download the **Preprocessed feature** from [Google Drive](https://drive.google.com/file/d/1yQM5UYWpueRjk0cM1yEurd44-YLnzHqt/view?usp=sharing) and place them into `./data/` folder.
 - Download our **Pretrained model weights** and place them into the `./Pretrained/` folder:  
-  [Download Link](https://drive.google.com/file/d/1lkCLmiD_4V1vaF8zkWFu8BUZ0COMoE5r/view?usp=sharing)
+  [Download Link](https://drive.google.com/file/d/1augdjTVNqgQ3dwpZO6pekBibGsPpcHBR/view?usp=sharing)
 - Download the **Checkpoints for evaluation** and place them into the `./output/` folder:  
-  [Download Link](https://drive.google.com/file/d/1PHDHvQjWasKYdy--Ge726TKbR7lg0CmW/view?usp=sharing)
+  [Download Link](https://drive.google.com/file/d/11llN0CGeBaOx8f53pJhwq1tf6BxGAN3u/view?usp=sharing)
 
 ---
 
